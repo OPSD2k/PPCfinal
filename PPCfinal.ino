@@ -5,8 +5,10 @@
 int ethanolSensorPin = A0;
 int ethanolSensorValue;
 int ethanolUpperLimit = 100; //Some number, will depend on sensor
-boolean userBoozed = false;
-
+boolean userBoozed1 = true;
+boolean userBoozed2 = true;
+boolean booze;
+boolean alcUndefined = true;
 int servoPin = 9;
 Servo lockServo;
 
@@ -26,8 +28,7 @@ int padNumberMatrix[4][4] = {
 };
 
 boolean codesMatch = true;
-boolean letUserInFromCode = false;
-
+boolean letUserInFromCode;
 
 
 void setup() {
@@ -43,17 +44,7 @@ void setup() {
 }
 
 void loop() {
-  ethanolSensorValue = analogRead(ethanolSensorPin);  //Read the value
-  Serial.print('E');  //Header E for ethanol
-  Serial.println(ethanolSensorValue);
-  if (ethanolSensorValue > 1200) { //Only send if there is too much ethanol sensed. value of 1000 seem to be normal for air.
-    userBoozed = true;
-  }
-  else {
-    userBoozed = false;
-  }
-  Serial.print("Boozed :");
-  Serial.println(userBoozed);
+
 
   //Algorithm to determine keypresses in the keypad matrix:
   //1. Set all pins connected to the rows to HIGH
@@ -88,29 +79,59 @@ void loop() {
       }
     }
     if (!codesMatch) {
-      Serial.println("Intruder alert");
       letUserInFromCode = false; //don't allow user in
+      Serial.println("intruder");
       for (int i = 0; i < 5; i++) { //clear the code entered array
         codeEnteredArray[i] = 0;
       }
       codesMatch = true; //Reset codesMatch checker
     }
     else {
-      //codesMatch = true;  //Reset codesMatch to true if they do
-      Serial.println("Acces granted");
       letUserInFromCode = true; //do allow user in
       for (int i = 0; i < 5; i++) { //clear the code entered array
         codeEnteredArray[i] = 0;
+        codesMatch = true;
       }
     }
   }
-  Serial.print("User allowed in: ");
-  Serial.println(letUserInFromCode);
 
 
-  //doorUnlock true if !Boozed and letUserInFromCode
-  
+  //Serial.println(letUserInFromCode);
 
-  //if(doorUnlock){
-  //lockServo.write(180); 180 for open
+  if (letUserInFromCode == true) {
+    delay(200);
+
+    while (alcUndefined == true) {
+      ethanolSensorValue = analogRead(ethanolSensorPin);  //Read the value
+      //check 1 for alcohol in breath
+      if (ethanolSensorValue > 1200) { //Only send if there is too much ethanol sensed. value of 1000 seem to be normal for air.
+        userBoozed1 = true;
+      }
+      else {
+        userBoozed1 = false;
+      }
+      delay(2000);
+      //checks after 2 secinds to see if values remained within the limits
+      if (userBoozed1 == userBoozed2) {
+        //Serial.println("boozed");
+        booze = true;
+        alcUndefined = false;
+        Serial.println("intruder");
+      } else {
+        // Serial.println("not boozed");
+        booze = false;
+        alcUndefined = false;
+      }
+    }
+  }
+
+  //if all checks were passed access is granted
+  if (alcUndefined == false && booze == false && letUserInFromCode == true) {
+    Serial.println(21);
+    //doorUnlock true if !Boozed and letUserInFromCode
+    //if(doorUnlock){
+    //lockServo.write(180); 180 for open
+
+  }
+
 }
