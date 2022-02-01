@@ -1,5 +1,6 @@
-//Made by Olivier Donker in January 2022. Inspired by https://microcontrollerslab.com/mq3-alcohol-sensor-arduino-tutorial/ .
-//Keep sensor calibration in mind!
+//Made by Olivier Donker & John De Zwart in January 2022. 
+//Inspired by https://microcontrollerslab.com/mq3-alcohol-sensor-arduino-tutorial/.
+
 #include <Servo.h>
 
 int ethanolSensorPin = A0;
@@ -30,7 +31,6 @@ int padNumberMatrix[4][4] = {
 boolean codesMatch = true;
 boolean letUserInFromCode;
 
-
 void setup() {
   Serial.begin(9600); //Open connection
   lockServo.attach(servoPin);  //setup servo
@@ -42,12 +42,9 @@ void setup() {
     pinMode(rowPins[i], OUTPUT);
     pinMode(columnPins[i], INPUT_PULLUP);
   }
-
 }
 
 void loop() {
-
-
   //Algorithm to determine keypresses in the keypad matrix:
   //1. Set all pins connected to the rows to HIGH
   //2. Set the first row to LOW
@@ -97,12 +94,8 @@ void loop() {
     }
   }
 
-
-  //Serial.println(letUserInFromCode);
-
   if (letUserInFromCode == true) {
     delay(200);
-
     while (alcUndefined == true) {
       ethanolSensorValue = analogRead(ethanolSensorPin);  //Read the value
       Serial.println(ethanolSensorValue);
@@ -132,6 +125,5 @@ void loop() {
   if (alcUndefined == false && booze == false && letUserInFromCode == true) {
     lockServo.write(120); //open. Use Arduino reset to close box again
     Serial.println("Access");
-    }
-
+  }
 }

@@ -6,7 +6,7 @@ class Access {
   float initX;
   float initY;
 
-  Access(float x, float y) { 
+  Access(float x, float y) {
     initX=x;
     initY=y;
 

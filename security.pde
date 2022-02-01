@@ -18,24 +18,20 @@ void setup()
   println("Available serial ports:");
 
   for (int i = 0; i<Serial.list().length; i++) {
-
     print("[" + i + "] ");
     println(Serial.list()[i]);
-    
   }
-  
   myPort = new Serial(this, Serial.list()[0], 9600); // open port 0 in the list at 9600 Baud
   myPort.bufferUntil(10);
-  
 }
 
 void draw()
 {
-   if (state!=null && state.equals("Access") == true ) {
+  if (state!=null && state.equals("Access") == true ) {
     Open.display();
     Open.check();
   }
-  
+
   if (state!=null && state.equals("Denied") == true) {
     Alarm.popUp();
     Alarm.securityLog();
