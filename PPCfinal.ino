@@ -9,7 +9,7 @@ boolean userBoozed1 = true;
 boolean userBoozed2 = true;
 boolean booze;
 boolean alcUndefined = true;
-int servoPin = 9;
+int servoPin = 12;
 Servo lockServo;
 
 int keyPadDebounceDelay = 100;
@@ -33,6 +33,8 @@ boolean letUserInFromCode;
 
 void setup() {
   Serial.begin(9600); //Open connection
+  lockServo.attach(servoPin);  //setup servo
+  lockServo.write(0); //Set it to a low position
 
   //Choose Arduino pin 2, 3, 4 and 5 for the rows, 6, 7, 8 and 9 for the columns.
   //Step 1 of algorithm below.
@@ -80,7 +82,7 @@ void loop() {
     }
     if (!codesMatch) {
       letUserInFromCode = false; //don't allow user in
-      Serial.println("intruder");
+      Serial.println("Denied");
       for (int i = 0; i < 5; i++) { //clear the code entered array
         codeEnteredArray[i] = 0;
       }
@@ -103,8 +105,9 @@ void loop() {
 
     while (alcUndefined == true) {
       ethanolSensorValue = analogRead(ethanolSensorPin);  //Read the value
+      Serial.println(ethanolSensorValue);
       //check 1 for alcohol in breath
-      if (ethanolSensorValue > 1200) { //Only send if there is too much ethanol sensed. value of 1000 seem to be normal for air.
+      if (ethanolSensorValue < 500) { //Only send if there is too much ethanol sensed. value of 940 seem to be normal for air, dipping two 200 for a shot glass of rum close by.
         userBoozed1 = true;
       }
       else {
@@ -116,7 +119,7 @@ void loop() {
         //Serial.println("boozed");
         booze = true;
         alcUndefined = false;
-        Serial.println("intruder");
+        Serial.println("Denied");
       } else {
         // Serial.println("not boozed");
         booze = false;
@@ -127,11 +130,8 @@ void loop() {
 
   //if all checks were passed access is granted
   if (alcUndefined == false && booze == false && letUserInFromCode == true) {
-    Serial.println(21);
-    //doorUnlock true if !Boozed and letUserInFromCode
-    //if(doorUnlock){
-    //lockServo.write(180); 180 for open
-
-  }
+    lockServo.write(120); //open. Use Arduino reset to close box again
+    Serial.println("Access");
+    }
 
 }
